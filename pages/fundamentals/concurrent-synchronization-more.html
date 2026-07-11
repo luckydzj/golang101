@@ -74,12 +74,11 @@ func main() {
 	var wg sync.WaitGroup
 	wg.Add(N)
 	for i := 0; i < N; i++ {
-		i := i
-		go func() {
-			values[i] = 50 + rand.Int31n(50)
-			fmt.Println("Done:", i)
+		go func(n int) {
+			values[n] = 50 + rand.Int31n(50)
+			fmt.Println("Done:", n)
 			wg.Done() // <=> wg.Add(-1)
-		}()
+		}(i)
 	}
 
 	wg.Wait()
@@ -104,11 +103,10 @@ values: [71 89 50 62 60]
 	var wg sync.WaitGroup
 	for i := 0; i < N; i++ {
 		wg.Add(1) // 将被执行5次
-		i := i
-		go func() {
-			values[i] = 50 + rand.Int31n(50)
+		go func(n int) {
+			values[n] = 50 + rand.Int31n(50)
 			wg.Done()
-		}()
+		}(i)
 	}
 ...
 </code></pre>
@@ -128,12 +126,11 @@ values: [71 89 50 62 60]
 	wgB.Add(1)
 
 	for i := 0; i < N; i++ {
-		i := i
-		go func() {
+		go func(n int) {
 			wgB.Wait() // 等待广播通知
-			log.Printf("values[%v]=%v \n", i, values[i])
+			log.Printf("values[%v]=%v \n", n, values[n])
 			wgA.Done()
-		}()
+		}(i)
 	}
 
 	// 下面这个循环保证将在上面的任何一个

@@ -207,10 +207,9 @@ Go运行时很难分辨出一个处于阻塞状态的协程是否将永久阻塞
 <pre class="line-numbers"><code class="language-go">func request() int {
 	c := make(chan int)
 	for i := 0; i < 5; i++ {
-		i := i
-		go func() {
-			c <- i // 4个协程将永久阻塞在这里
-		}()
+		go func(n int) {
+			c <- n // 4个协程将永久阻塞在这里
+		}(i)
 	}
 	return <-c
 }
@@ -225,13 +224,12 @@ Go运行时很难分辨出一个处于阻塞状态的协程是否将永久阻塞
 <pre class="line-numbers"><code class="language-go">func request() int {
 	c := make(chan int)
 	for i := 0; i < 5; i++ {
-		i := i
-		go func() {
+		go func(n int) {
 			select {
-			case c <- i:
+			case c <- n:
 			default:
 			}
-		}()
+		}(i)
 	}
 	return <-c // 有可能永久阻塞在此
 }
